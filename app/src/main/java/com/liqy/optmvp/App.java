@@ -3,6 +3,9 @@ package com.liqy.optmvp;
 import android.app.Application;
 import android.content.Context;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
 /**
  * @file FileName
  * optMVP
@@ -17,5 +20,8 @@ public class App extends Application{
     public void onCreate() {
         super.onCreate();
         context=this;
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .build();
+        ImageLoader.getInstance().init(config);
     }
 }

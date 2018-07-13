@@ -31,4 +31,7 @@ dependencies {
     implementation 'com.android.volley:volley:1.1.1-rc1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.github.ikidou:TypeBuilder:1.0'
+
+
+    implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 }
