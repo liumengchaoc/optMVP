@@ -1,8 +1,10 @@
 package com.liqy.optmvp.view.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +12,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.NetworkImageView;
+import com.jaeger.ninegridimageview.NineGridImageView;
+import com.jaeger.ninegridimageview.NineGridImageViewAdapter;
 import com.liqy.optmvp.R;
 import com.liqy.optmvp.model.Comment;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.CircleBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
+import com.previewlibrary.GPreviewBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,27 +39,38 @@ public class CommentAdapter extends BaseAdapter {
     public static final int TYPE_COUNT = 2;
 
     private List<Comment> comments;
-
     private Context context;
 
     private LayoutInflater inflater;
     private ImageLoader loader;
+    DisplayImageOptions optionsCircle;
     DisplayImageOptions options;
 
     public CommentAdapter(Context context) {
         this.comments = new ArrayList<>();
         this.context = context;
-        this.inflater=LayoutInflater.from(context);
-        loader=ImageLoader.getInstance();
-         options = new DisplayImageOptions.Builder()
+        this.inflater = LayoutInflater.from(context);
+        loader = ImageLoader.getInstance();
+        optionsCircle = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.mipmap.ic_launcher_round) // resource or drawable
                 .showImageForEmptyUri(R.mipmap.ic_launcher_round) // resource or drawable
                 .showImageOnFail(R.mipmap.ic_launcher_round) // resource or drawable
                 .cacheInMemory(true) // default
                 .cacheOnDisk(true) // default
                 .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
-                .bitmapConfig(Bitmap.Config.ARGB_8888) // default
-		        .displayer(new CircleBitmapDisplayer(Color.WHITE)) // default
+                .bitmapConfig(Bitmap.Config.RGB_565) // default
+                .displayer(new CircleBitmapDisplayer(Color.BLACK, 1)) // default
+                .build();
+
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.mipmap.ic_launcher_round) // resource or drawable
+                .showImageForEmptyUri(R.mipmap.ic_launcher_round) // resource or drawable
+                .showImageOnFail(R.mipmap.ic_launcher_round) // resource or drawable
+                .cacheInMemory(true) // default
+                .cacheOnDisk(true) // default
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default
+                .bitmapConfig(Bitmap.Config.RGB_565) // default
+                .displayer(new SimpleBitmapDisplayer()) // default
                 .build();
     }
 
@@ -98,27 +116,27 @@ public class CommentAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolderText holderText=null;
-        ViewHolderTextImage holderTextImage=null;
+        ViewHolderText holderText = null;
+        ViewHolderTextImage holderTextImage = null;
 
         int type = getItemViewType(i);
-        Comment comment=getItem(i);
+        final Comment comment = getItem(i);
 
         if (view == null) {
             if (type == TYPE_TEXT) {
-                view=inflater.inflate(R.layout.item_text,viewGroup,false);
-                holderText=new ViewHolderText(view);
+                view = inflater.inflate(R.layout.item_text, viewGroup, false);
+                holderText = new ViewHolderText(view);
                 view.setTag(holderText);
             } else if (type == TYPE_TEXT_IMAGE) {
-                view=inflater.inflate(R.layout.item_text_image,viewGroup,false);
-                holderTextImage=new ViewHolderTextImage(view);
+                view = inflater.inflate(R.layout.item_text_image, viewGroup, false);
+                holderTextImage = new ViewHolderTextImage(view);
                 view.setTag(holderTextImage);
             }
         } else {
             if (type == TYPE_TEXT) {
-                holderText=(ViewHolderText) view.getTag();
+                holderText = (ViewHolderText) view.getTag();
             } else if (type == TYPE_TEXT_IMAGE) {
-                holderTextImage=(ViewHolderTextImage)view.getTag();
+                holderTextImage = (ViewHolderTextImage) view.getTag();
             }
         }
 
@@ -127,11 +145,47 @@ public class CommentAdapter extends BaseAdapter {
             holderText.user_name.setText(comment.user_name);
             holderText.user_comment.setText(comment.comment_data);
             holderText.user_comment_time.setText(comment.comment_time);
-            loader.displayImage(comment.avatar,holderText.user_icon,options);
+            loader.displayImage(comment.avatar, holderText.user_icon, optionsCircle);
         } else if (type == TYPE_TEXT_IMAGE) {
             holderTextImage.user_name.setText(comment.user_name);
             holderTextImage.user_comment.setText(comment.comment_data);
             holderTextImage.user_comment_time.setText(comment.comment_time);
+
+
+            final NineGridImageView nineGridImageView=holderTextImage.user_images;
+            NineGridImageViewAdapter<String> adapter = new NineGridImageViewAdapter<String>() {
+                @Override
+                protected void onDisplayImage(Context context, ImageView imageView, String s) {
+                    loader.displayImage(s, imageView, options);
+                }
+
+                @Override
+                protected void onItemImageClick(Context context, ImageView imageView, int index, List<String> list) {
+                    super.onItemImageClick(context, imageView, index, list);
+
+                    List<PhotoInfo> infos = new ArrayList<>();
+                    for (String url : comment.pic_url) {
+                        infos.add(new PhotoInfo(url));
+                    }
+
+                    /**
+                     * 拼接集合
+                     */
+                    computeBoundsBackward(nineGridImageView,infos);
+
+                    /**
+                     * 跳转
+                     */
+                    GPreviewBuilder.from((Activity) context)
+                            .setData(infos)
+                            .setCurrentIndex(index)//
+                            .setType(GPreviewBuilder.IndicatorType.Number)
+                            .start();//启动
+                }
+            };
+
+            holderTextImage.user_images.setAdapter(adapter);
+            holderTextImage.user_images.setImagesData(comment.pic_url);
         }
 
         return view;
@@ -147,10 +201,10 @@ public class CommentAdapter extends BaseAdapter {
         ImageView user_icon;
 
         public ViewHolderText(View view) {
-            user_name=(TextView)view.findViewById(R.id.user_name);
-            user_comment=(TextView)view.findViewById(R.id.user_comment);
-            user_comment_time=(TextView)view.findViewById(R.id.user_comment_time);
-            user_icon=(ImageView) view.findViewById(R.id.user_icon);
+            user_name = (TextView) view.findViewById(R.id.user_name);
+            user_comment = (TextView) view.findViewById(R.id.user_comment);
+            user_comment_time = (TextView) view.findViewById(R.id.user_comment_time);
+            user_icon = (ImageView) view.findViewById(R.id.user_icon);
         }
     }
 
@@ -158,13 +212,29 @@ public class CommentAdapter extends BaseAdapter {
      * 图片加文字
      */
     static class ViewHolderTextImage extends ViewHolderText {
-        ImageView user_images;
+        NineGridImageView user_images;
 
         public ViewHolderTextImage(View view) {
             super(view);
-            this.user_images =(ImageView)view.findViewById(R.id.user_images);
+            this.user_images = (NineGridImageView) view.findViewById(R.id.user_images);
         }
     }
 
+    /**
+     * 查找信息
+     * @param user_images 九宫格控件
+     * @param list 数据列表
+     */
+    private void computeBoundsBackward(NineGridImageView user_images, List<PhotoInfo> list) {
+        for (int i = 0; i < user_images.getChildCount(); i++) {
+            View itemView = user_images.getChildAt(i);//
+            Rect bounds = new Rect();
+            if (itemView != null) {
+                ImageView thumbView = (ImageView) itemView;
+                thumbView.getGlobalVisibleRect(bounds);
+            }
+            list.get(i).mBounds = bounds;
+        }
 
+    }
 }

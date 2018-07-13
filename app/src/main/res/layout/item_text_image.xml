@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
     <ImageView
         android:id="@+id/user_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@mipmap/ic_launcher" />
 
 
@@ -14,34 +16,39 @@
         android:id="@+id/layout_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/user_icon"
-        >
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/user_icon">
 
         <TextView
             android:id="@+id/user_name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black" />
 
         <TextView
-            android:layout_below="@id/user_name"
             android:id="@+id/user_comment"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_name" />
 
         <TextView
-            android:layout_alignParentRight="true"
-            android:layout_alignBaseline="@id/user_name"
             android:id="@+id/user_comment_time"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/user_name"
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout>
 
-    <ImageView
-        android:layout_below="@id/layout_comment"
-        android:layout_width="wrap_content"
+    <com.jaeger.ninegridimageview.NineGridImageView
         android:id="@+id/user_images"
-        android:src="@mipmap/ic_launcher"
-        android:layout_height="wrap_content" />
+        android:layout_below="@id/layout_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:imgGap="4dp"
+        app:showStyle="fill"
+        app:singleImgSize="120dp" />
+
 
 </RelativeLayout>

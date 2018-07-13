@@ -35,7 +35,7 @@ public class CommentPresenter implements ICommentPresenter {
      */
     @Override
     public void getCommentList() {
-        task.getCommentList("http://39.108.3.12:3000/v1/comment?restaurant_id=32&offset=0&limit=5", new ICallBack() {
+        task.getCommentList("http://39.108.3.12:3000/v1/comment?restaurant_id=32&offset=0&limit=10", new ICallBack() {
             @Override
             public void success(List<Comment> data) {
                 if (view != null)
