@@ -23,6 +23,7 @@ public class CommentPresenter implements ICommentPresenter {
 
     /**
      * 构造方法
+     *
      * @param activity
      */
     public CommentPresenter(CommentActivity activity) {
@@ -30,16 +31,55 @@ public class CommentPresenter implements ICommentPresenter {
         view = activity;
     }
 
+
     /**
-     * 获取评论列表
+     * 首次加载
+     */
+    public void getFirstData(){
+        getCommentList(0,10,false);
+    }
+
+    /**
+     * 加载更多数据
+     * @param page
+     */
+    public void getMoreData(int page){
+        getCommentList(1,10,false);
+    }
+
+    /**
+     * 刷新数据
+     */
+    public void refreshData(){
+        getCommentList(0,10,true);
+    }
+
+
+    /**
+     * 获取列表
+     *
+     * @param page
+     * @param count
      */
     @Override
-    public void getCommentList() {
-        task.getCommentList("http://39.108.3.12:3000/v1/comment?restaurant_id=32&offset=0&limit=10", new ICallBack() {
+    public void getCommentList(final int page, int count, final boolean isRefresh) {
+
+        String url = "http://39.108.3.12:3000/v1/comment?restaurant_id=32&offset=" + page + "&limit=" + count;
+
+        task.getCommentList(url, new ICallBack() {
             @Override
             public void success(List<Comment> data) {
-                if (view != null)
-                    view.showData(data);
+                if (view != null) {
+                    if (page == 0) {
+                        if (isRefresh) {
+                            view.showRefreshData(data);
+                        } else {
+                            view.showFirstData(data);
+                        }
+                    } else {
+                        view.showMoreData(data);
+                    }
+                }
             }
 
             @Override
@@ -49,6 +89,7 @@ public class CommentPresenter implements ICommentPresenter {
             }
         });
     }
+
 
     @Override
     public void start() {

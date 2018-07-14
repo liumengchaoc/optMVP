@@ -8,6 +8,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.liqy.optmvp.App;
+import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Type;
 
@@ -26,6 +27,7 @@ public class CommentTask implements ICommentTask {
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                Logger.json(response);
                 RootData<Comment> data = fromJsonArray(response, Comment.class);
                 callBack.success(data.data);
             }

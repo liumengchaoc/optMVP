@@ -84,6 +84,13 @@ public class CommentAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    /**
+     * 清除数据
+     */
+    public void clearData(){
+        this.comments.clear();
+    }
+
     @Override
     public int getCount() {
         return comments.size();

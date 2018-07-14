@@ -15,7 +15,10 @@ public interface ICommentView extends BaseView<CommentPresenter> {
      * 展示数据
      * @param list
      */
-    void showData(List<Comment> list);
-
+    void showFirstData(List<Comment> list);
+    void showMoreData(List<Comment> list);
+    void showRefreshData(List<Comment> list);
     void showError(String string);
+
+
 }

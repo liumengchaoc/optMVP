@@ -9,5 +9,5 @@ import com.liqy.optmvp.BasePresenter;
  * Copyright 星期四 YourCompany.
  */
 public interface ICommentPresenter extends BasePresenter {
-    void getCommentList();
+    void getCommentList(int page,int count,boolean isRefresh);
 }

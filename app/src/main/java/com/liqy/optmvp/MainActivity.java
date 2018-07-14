@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity  {
 
 
 
+
         ICommentTask task=new CommentTask();
         task.getCommentList("http://39.108.3.12:3000/v1/comment?restaurant_id=32&offset=0&limit=5", new ICallBack() {
             @Override
